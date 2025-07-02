@@ -1,8 +1,4 @@
-async function initializeDatabase() {
-  try {
-    // Create appraisals table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS appraisals (
+CREATE TABLE IF NOT EXISTS appraisals (
         id SERIAL PRIMARY KEY,
         employee_id VARCHAR(7) NOT NULL,
         employee_name VARCHAR(30) NOT NULL,
@@ -15,11 +11,9 @@ async function initializeDatabase() {
         comments TEXT,
         CONSTRAINT unique_employee_date UNIQUE (employee_id, appraisal_date)
       );
-    `);
 
-    // Create reviews table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS reviews (
+
+CREATE TABLE IF NOT EXISTS reviews (
         id SERIAL PRIMARY KEY,
         employee_id VARCHAR(7) NOT NULL,
         employee_name VARCHAR(30) NOT NULL,
@@ -29,34 +23,3 @@ async function initializeDatabase() {
         review_text TEXT NOT NULL,
         review_date DATE NOT NULL
       );
-    `);
-
-    // Insert initial appraisal data if table is empty
-    const { rowCount: appraisalCount } = await pool.query('SELECT * FROM appraisals');
-    if (appraisalCount === 0) {
-      await pool.query(`
-        INSERT INTO appraisals (employee_id, employee_name, position, department, appraisal_date, rating, strengths, improvements, comments)
-        VALUES
-          ('ATS0123', 'Raghava', 'Junior Developer', 'IT', '2023-05-15', 4, 'Excellent technical skills, strong team player', 'Could improve time estimation for tasks', ''),
-          ('ATS0456', 'Ajay', 'Java Developer', 'Software Developer', '2023-06-20', 5, 'Creative campaigns, great leadership', 'Needs to delegate more effectively', ''),
-          ('ATS0789', 'Ilyas', 'HR Specialist', 'HR', '2023-07-10', 4, 'Strong interpersonal skills, reliable', 'Could enhance recruitment strategies', ''),
-          ('ATS0124', 'Pavan', 'Financial Analyst', 'Finance', '2023-04-05', 3, 'Attention to detail, reliable', 'Should speak up more in meetings', '')
-      `);
-    }
-
-    // Insert initial review data if table is empty
-    const { rowCount: reviewCount } = await pool.query('SELECT * FROM reviews');
-    if (reviewCount === 0) {
-      await pool.query(`
-        INSERT INTO reviews (employee_id, employee_name, department, role, rating, review_text, review_date)
-        VALUES
-          ('ATS0125', 'Shravan Reddy', 'Developer', 'Senior Software Engineer', 4, 'He has shown excellent problem-solving skills and dedication.', '2023-08-01'),
-          ('ATS0789', 'Ilyas Zubair', 'HR', 'HR Manager', 4, 'He is a great team player and handles employee relations effectively.', '2023-08-02'),
-          ('ATS0345', 'Srikant Nalla', 'Manager', 'Project Manager', 5, 'He is a strong leader and ensures timely project delivery.', '2023-08-03'),
-          ('ATS0678', 'Jay Simha', 'Manager', 'Manager', 5, 'He is a strong leader and ensures timely project delivery.', '2023-08-04')
-      `);
-    }
-  } catch (err) {
-    console.error('Error initializing database:', err);
-  }
-}
