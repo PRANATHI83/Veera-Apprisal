@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: veera_apprisal_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin234
+      POSTGRES_DB: hr_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - apprisal_net
+
+  backend:
+    build: ./Backend
+    container_name: veera_apprisal_backend
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+    networks:
+      - apprisal_net
+
+  frontend:
+    build: ./Frontend
+    container_name: veera_apprisal_frontend
+    ports:
+      - "8006:80"
+    depends_on:
+      - backend
+    networks:
+      - apprisal_net
+
+  hr:
+    build: ./HR
+    container_name: veera_apprisal_hr
+    ports:
+      - "8007:80"
+    depends_on:
+      - backend
+    networks:
+      - apprisal_net
+
+volumes:
+  pgdata:
+
+networks:
+  apprisal_net:
+
